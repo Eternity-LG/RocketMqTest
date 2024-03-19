@@ -26,22 +26,20 @@ public class PushConsumer {
             */
             consumer.subscribe("Test", "*");
             //创建监听，当有新的消息监听程序会及时捕捉并加以处理。
-            consumer.registerMessageListener(new MessageListenerConcurrently() {
-                public ConsumeConcurrentlyStatus consumeMessage(
-                        List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
-                    //批量数据处理
-                    for (MessageExt msg : msgs) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        System.out.println("消费者获取数据:" + msg.getMsgId() + "==>" + new
-                                String(msg.getBody()));
+            consumer.registerMessageListener((MessageListenerConcurrently) (msgs, context) -> {
+                //批量数据处理
+                for (MessageExt msg : msgs) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                    //返回数据已接收标识
-                    return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+
+                    System.out.println("消费者获取数据:" + msg.getMsgId() + "==>" + new
+                            String(msg.getBody()));
                 }
+                //返回数据已接收标识
+                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             });
             //启动消费者，与Broker建立长连接，开始监听。
             consumer.start();
